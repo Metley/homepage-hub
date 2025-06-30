@@ -25,14 +25,36 @@ export default function Index() {
   const handleChangeUrl = (input: string) => {
     setUrl(input);
     if (input.slice(0, 7) === "http://" || input.slice(0, 8) === "https://") {
+      handleFetchImage();
       setErrorUrlMessage("");
     } else {
       setErrorUrlMessage("URL must start with http:// or https://");
     }
   };
 
+  const handleFetchImage = async () => {
+    if (!url) return;
+    try {
+      const response = await fetch(url.toLowerCase() + "/favicon.ico");
+
+      if (response.headers.get("content-type") === "image/x-icon") {
+        setImage(url.toLowerCase() + "/favicon.ico");
+      } else {
+        setImage(
+          "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
+        );
+      }
+    } catch (error) {
+      setImage(
+        "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
+      );
+    }
+  };
+
   const handleAddHomepage = async () => {
-    const addObject = { name, url };
+    if (!name || !url || !image) return;
+
+    const addObject = { name, url, image };
 
     try {
       const currentList = JSON.parse(
@@ -46,20 +68,9 @@ export default function Index() {
 
     router.replace("/");
   };
+
   const handleCancelHomepage = () => {
     router.replace("/");
-  };
-
-  const handleFetchImage = async () => {
-    const response = await fetch(url.toLowerCase() + "/favicon.ico");
-
-    if (response.headers.get("content-type") === "image/x-icon") {
-      setImage(url.toLowerCase() + "/favicon.ico");
-    } else {
-      setImage(
-        "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
-      );
-    }
   };
 
   return (
