@@ -1,3 +1,4 @@
+import { HomePage } from "@/types/homepage.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -25,20 +26,20 @@ export default function Index() {
   const handleChangeUrl = (input: string) => {
     setUrl(input);
     if (input.slice(0, 7) === "http://" || input.slice(0, 8) === "https://") {
-      handleFetchImage();
+      handleFetchImage(input);
       setErrorUrlMessage("");
     } else {
       setErrorUrlMessage("URL must start with http:// or https://");
     }
   };
 
-  const handleFetchImage = async () => {
-    if (!url) return;
+  const handleFetchImage = async (input: string) => {
+    if (!input) return;
     try {
-      const response = await fetch(url.toLowerCase() + "/favicon.ico");
+      const response = await fetch(input.toLowerCase() + "/favicon.ico");
 
       if (response.headers.get("content-type") === "image/x-icon") {
-        setImage(url.toLowerCase() + "/favicon.ico");
+        setImage(input.toLowerCase() + "/favicon.ico");
       } else {
         setImage(
           "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
@@ -54,13 +55,21 @@ export default function Index() {
   const handleAddHomepage = async () => {
     if (!name || !url || !image) return;
 
-    const addObject = { name, url, image };
-
     try {
       const currentList = JSON.parse(
         (await AsyncStorage.getItem("homepage-list")) || "[]"
       );
-      const newList = [...currentList, addObject];
+      const custom_position: number = currentList.length || 0;
+      const created_at: string = new Date().toISOString();
+      const addObject: HomePage = {
+        name,
+        url,
+        image,
+        custom_position,
+        created_at,
+      };
+
+      const newList: HomePage[] = [...currentList, addObject];
       await AsyncStorage.setItem("homepage-list", JSON.stringify(newList));
     } catch (error) {
       console.error(error);
