@@ -3,7 +3,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { Appbar, Button, HelperText, TextInput } from "react-native-paper";
+import {
+  Appbar,
+  Button,
+  HelperText,
+  TextInput,
+  useTheme,
+} from "react-native-paper";
 
 export default function Index() {
   const [name, setName] = useState<string>("");
@@ -13,6 +19,7 @@ export default function Index() {
   const [errorUrlMessage, setErrorUrlMessage] = useState<string>("");
 
   const router = useRouter();
+  const theme = useTheme();
 
   const handleChangeName = (input: string) => {
     setName(input);
@@ -83,7 +90,9 @@ export default function Index() {
   };
 
   return (
-    <>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Add Homepage" />
@@ -91,7 +100,7 @@ export default function Index() {
       <View style={styles.imageContainer}>
         <Image src={image} width={100} height={100} style={styles.image} />
       </View>
-      <View style={styles.container}>
+      <View style={styles.inputContainer}>
         <TextInput
           label="Name"
           onChangeText={(input) => handleChangeName(input)}
@@ -124,12 +133,15 @@ export default function Index() {
           </Button>
         </View>
       </View>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  inputContainer: {
     flex: 1,
     padding: 16,
     justifyContent: "flex-start",
