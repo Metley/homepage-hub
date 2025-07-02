@@ -2,14 +2,40 @@ import { HomePage } from "@/types/homepage.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, StyleSheet } from "react-native";
-import { Appbar, Card } from "react-native-paper";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import {
+  Appbar,
+  Avatar,
+  Card,
+  Divider,
+  Menu,
+  Text,
+  useTheme,
+} from "react-native-paper";
 
 export default function Index() {
   const [homepageList, setHomepageList] = useState<HomePage[]>();
+  const [sortType, setSortType] = useState<string>("ADDED - ASCENDING");
   const router = useRouter();
-  const cardGap = 16;
-  const cardWidth = (Dimensions.get("window").width - cardGap * 3) / 2;
+  const theme = useTheme();
+
+  const [visible, setVisible] = useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
+  const sortTypeList: string = [
+    "ADDED - ASCENDING",
+    "ADDED - DESCENDING",
+    "NAME - ASCENDING",
+    "NAME - DESCENDING",
+    "CUSTOM",
+  ];
 
   useEffect(() => {
     fetchHomepages();
@@ -34,6 +60,16 @@ export default function Index() {
     }
   };
 
+  const handleFetchImage = async (url: string) => {
+    const response = await fetch(url.toLowerCase() + "/favicon.ico");
+
+    if (response.headers.get("content-type") === "image/x-icon") {
+      return url.toLowerCase() + "/favicon.ico";
+    } else {
+      return "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000";
+    }
+  };
+
   const resetDatabase = async () => {
     await AsyncStorage.clear();
     await fetchHomepages();
@@ -43,64 +79,204 @@ export default function Index() {
     <Card
       style={styles.card}
       onPress={() => {
-        console.log(homepage.url + "/favicon.ico");
+        console.log(homepage.image);
       }}
     >
-      <Image
-        src={getImage(homepage.url)}
-        height={48}
-        width={48}
-        style={styles.image}
+      <Image src={homepage.image} height={48} width={48} style={styles.image} />
+      <Card.Title
+        style={styles.title}
+        title={homepage.name}
+        left={(props) => (
+          <Image
+            {...props}
+            src={getImage(homepage.url)}
+            height={48}
+            width={48}
+            style={styles.image}
+          />
+        )}
       />
-      <Card.Title style={styles.title} title={homepage.name} />
     </Card>
   );
 
+  const handleSortTypeChange = (type: string) => {
+    switch (type) {
+      case "ADDED - ASCENDING":
+        return function (a: HomePage, b: HomePage) {
+          return (
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
+        };
+      case "ADDED - DESCENDING":
+        return function (a: HomePage, b: HomePage) {
+          return (
+            (new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime()) *
+            -1
+          );
+        };
+      case "NAME - ASCENDING":
+        return function (a: HomePage, b: HomePage) {
+          let x = a.name.toLowerCase();
+          let y = b.name.toLowerCase();
+          if (x < y) {
+            return -1;
+          }
+          if (x > y) {
+            return 1;
+          }
+          return 0;
+        };
+      case "NAME - DESCENDING":
+        return function (a: HomePage, b: HomePage) {
+          let x = a.name.toLowerCase();
+          let y = b.name.toLowerCase();
+          if (x < y) {
+            return 1;
+          }
+          if (x > y) {
+            return -1;
+          }
+          return 0;
+        };
+      case "CUSTOM":
+        return function (a: HomePage, b: HomePage) {
+          return a.custom_position - b.custom_position;
+        };
+      default:
+        break;
+    }
+  };
+
+  const sortedHomepageList = homepageList?.sort(handleSortTypeChange(sortType));
+
+  const HomeCard = ({ homepage }) => (
+    <TouchableOpacity
+      onPress={() => console.log(homepage.image)}
+      style={styles.card}
+    >
+      {homepage.image !==
+      "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000" ? (
+        <Avatar.Image
+          style={{ backgroundColor: theme.colors.background }}
+          size={48}
+          source={{ uri: homepage.image }}
+        />
+      ) : (
+        <Avatar.Text
+          style={{
+            backgroundColor: theme.colors.background,
+            borderColor: theme.colors.outline,
+            borderWidth: 1,
+          }}
+          size={48}
+          label={homepage.name[0]}
+        />
+      )}
+
+      <Text numberOfLines={1} style={styles.title}>
+        {homepage.name}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <Appbar.Header>
+        <Appbar.Action icon="cog" onPress={openMenu} />
         <Appbar.Content title="Home" />
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <Menu
+            visible={visible}
+            onDismiss={closeMenu}
+            anchor={<Appbar.Action icon="sort-variant" onPress={openMenu} />}
+          >
+            <Menu.Item
+              leadingIcon="sort-ascending"
+              onPress={() => {
+                setSortType("ADDED - ASCENDING");
+                closeMenu();
+              }}
+              title="Date Added"
+            />
+            <Menu.Item
+              leadingIcon="sort-descending"
+              onPress={() => {
+                setSortType("ADDED - DESCENDING");
+                closeMenu();
+              }}
+              title="Date Added"
+            />
+            <Divider />
+            <Menu.Item
+              leadingIcon="sort-alphabetical-ascending"
+              onPress={() => {
+                setSortType("NAME - ASCENDING");
+                closeMenu();
+              }}
+              title="Name"
+            />
+            <Menu.Item
+              leadingIcon="sort-alphabetical-descending"
+              onPress={() => {
+                setSortType("NAME - DESCENDING");
+                closeMenu();
+              }}
+              title="Name"
+            />
+            <Divider />
+            <Menu.Item
+              leadingIcon="sort"
+              onPress={() => {
+                setSortType("CUSTOM");
+                closeMenu();
+              }}
+              title="Custom"
+            />
+          </Menu>
+        </View>
+
         <Appbar.Action
           icon="plus"
           onPress={() => router.navigate("/add-homepage")}
         />
       </Appbar.Header>
 
-      <FlatList
-        numColumns={2}
-        data={homepageList}
-        renderItem={({ item }) => <Item homepage={item} />}
-        contentContainerStyle={{}}
-        columnWrapperStyle={{ justifyContent: "space-evenly" }}
-      />
-    </>
+      <View style={{}}>
+        <FlatList
+          numColumns={3}
+          data={sortedHomepageList}
+          renderItem={({ item }) => <HomeCard homepage={item} />}
+          contentContainerStyle={{}}
+          columnWrapperStyle={{ justifyContent: "flex-start" }}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    flexWrap: "wrap",
   },
   card: {
-    marginBottom: 18,
-    margin: 10,
-    borderRadius: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-    width: "40%",
-    height: "auto",
+    marginTop: 8,
+    marginBottom: 8,
     alignItems: "center",
+    width: "33.3%",
+    height: "auto",
   },
   image: {
-    justifyContent: "center",
-    alignContent: "center",
+    backgroundColor: "#f5f5f5",
   },
   title: {
-    alignItems: "center",
+    marginTop: 1,
   },
 });
