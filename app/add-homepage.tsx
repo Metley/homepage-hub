@@ -15,6 +15,7 @@ export default function Index() {
   const [name, setName] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [image, setImage] = useState<string>("");
+  const [errorImageMessage, setErrorImageMessage] = useState<string>("");
   const [errorNameMessage, setErrorNameMessage] = useState<string>("");
   const [errorUrlMessage, setErrorUrlMessage] = useState<string>("");
 
@@ -47,15 +48,18 @@ export default function Index() {
 
       if (response.headers.get("content-type") === "image/x-icon") {
         setImage(input.toLowerCase() + "/favicon.ico");
+        setErrorImageMessage("");
       } else {
         setImage(
           "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
         );
+        setErrorImageMessage("Favicon not found");
       }
     } catch (error) {
       setImage(
         "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
       );
+      setErrorImageMessage("Favicon not found");
     }
   };
 
@@ -99,6 +103,7 @@ export default function Index() {
       </Appbar.Header>
       <View style={styles.imageContainer}>
         <Image src={image} width={100} height={100} style={styles.image} />
+        <HelperText type="error">{errorImageMessage}</HelperText>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
