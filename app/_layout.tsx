@@ -1,5 +1,7 @@
+import { SettingProvider } from "@/lib/setting.context";
 import { Stack, useRouter } from "expo-router";
 import { StyleSheet, useColorScheme, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   MD3DarkTheme,
   MD3LightTheme,
@@ -25,6 +27,10 @@ const AppContent = () => {
           name="add-homepage"
           options={{ title: "Add", headerShown: false }}
         />
+        <Stack.Screen
+          name="setting"
+          options={{ title: "Setting", headerShown: false }}
+        />
       </Stack>
     </View>
   );
@@ -34,7 +40,11 @@ export default function RootLayout() {
   const theme = useColorScheme() === "dark" ? MD3DarkTheme : MD3LightTheme;
   return (
     <PaperProvider theme={theme}>
-      <AppContent />
+      <GestureHandlerRootView>
+        <SettingProvider>
+          <AppContent />
+        </SettingProvider>
+      </GestureHandlerRootView>
     </PaperProvider>
   );
 }
