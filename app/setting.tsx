@@ -1,0 +1,284 @@
+import { useSettingContext } from "@/lib/setting.context";
+import { HomePage } from "@/types/homepage.context";
+import { Setting, ThemePreference } from "@/types/setting.context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import {
+  Appbar,
+  Button,
+  Divider,
+  IconButton,
+  SegmentedButtons,
+  Switch,
+  Text,
+  useTheme,
+} from "react-native-paper";
+
+export default function SettingScreen() {
+  const router = useRouter();
+  const theme = useTheme();
+  const { themePreference, setThemePreference } = useSettingContext();
+
+  const [themeMode, setThemeMode] = useState<ThemePreference>("System");
+  const [headerMode, setHeaderMode] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<string>("App");
+
+  const [homepageList, setHomepageList] = useState<HomePage[]>([]);
+  const [appSetting, setAppSetting] = useState<Setting>();
+
+  useEffect(() => {
+    fetchHomepages();
+    fetchAppSetting();
+  }, []);
+
+  const fetchHomepages = async () => {
+    try {
+      const currentList = JSON.parse(
+        (await AsyncStorage.getItem("homepage-list")) || "[]"
+      );
+      setHomepageList(currentList);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchAppSetting = async () => {
+    try {
+      const appSettingStorage = await AsyncStorage.getItem("setting");
+      if (appSettingStorage !== null) {
+        const appSetting = JSON.parse(appSettingStorage);
+        setAppSetting(appSetting);
+        setThemeMode(appSetting.theme);
+        setHeaderMode(appSetting.navBar);
+        setViewMode(appSetting.viewStyle);
+      } else {
+        console.log("Failed to retrieve setting");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const moveUp = ({ homepage }: { homepage: HomePage }) => {
+    if (homepage.custom_position !== 0) {
+      const currentList: HomePage[] = [...homepageList];
+
+      const currentIndex = homepageList.indexOf(homepage);
+
+      const swapItem = homepageList.filter(
+        (item) => item.custom_position === homepage.custom_position - 1
+      );
+
+      const swapIndex = homepageList.indexOf(swapItem[0]);
+
+      currentList[currentIndex].custom_position = homepage.custom_position - 1;
+      currentList[swapIndex].custom_position = swapItem[0].custom_position + 1;
+      setHomepageList(currentList);
+    }
+  };
+
+  const moveDown = ({ homepage }: { homepage: HomePage }) => {
+    if (homepage.custom_position !== homepageList.length - 1) {
+      const currentList: HomePage[] = [...homepageList];
+
+      const currentIndex = homepageList.indexOf(homepage);
+
+      const swapItem = homepageList.filter(
+        (item) => item.custom_position === homepage.custom_position + 1
+      );
+
+      const swapIndex = homepageList.indexOf(swapItem[0]);
+
+      currentList[currentIndex].custom_position = homepage.custom_position + 1;
+      currentList[swapIndex].custom_position = swapItem[0].custom_position - 1;
+      setHomepageList(currentList);
+    }
+  };
+
+  const ListItem = ({ homepage }: { homepage: HomePage }) => (
+    <View style={styles.cardView}>
+      <Text numberOfLines={1} style={styles.cardTitle}>
+        {homepage.name}
+      </Text>
+      <IconButton
+        disabled={homepage.custom_position === 0}
+        style={styles.cardIcon}
+        icon="arrow-up"
+        onPress={() => moveUp({ homepage })}
+      />
+
+      <IconButton
+        disabled={homepage.custom_position === homepageList.length - 1}
+        style={styles.cardIcon}
+        icon="arrow-down"
+        onPress={() => moveDown({ homepage })}
+      />
+    </View>
+  );
+
+  const saveSetting = async () => {
+    try {
+      const newAppSetting: Setting = {
+        theme: themeMode,
+        navBar: headerMode,
+        viewStyle: viewMode,
+      };
+      await AsyncStorage.setItem("setting", JSON.stringify(newAppSetting));
+      await AsyncStorage.setItem("homepage-list", JSON.stringify(homepageList));
+      setThemePreference(themeMode);
+      router.navigate("/");
+    } catch (error) {
+      console.error("Saving Setting Error", error);
+    }
+  };
+
+  const sortedHomepageList = homepageList.sort(function (
+    a: HomePage,
+    b: HomePage
+  ) {
+    return a.custom_position - b.custom_position;
+  });
+
+  return (
+    <>
+      <View
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.Content title="Setting" />
+        </Appbar.Header>
+        <ScrollView style={{ marginBottom: 20 }}>
+          <View>
+            <Text style={styles.sectionTitle} variant="displaySmall">
+              Apperance
+            </Text>
+            <Divider />
+
+            <Text style={styles.sectionSubTitle} variant="titleMedium">
+              UI Theme:
+            </Text>
+            <SegmentedButtons
+              value={themeMode}
+              onValueChange={setThemeMode}
+              buttons={[
+                {
+                  value: "System",
+                  label: "System",
+                },
+                {
+                  value: "Dark",
+                  label: "Dark",
+                },
+                {
+                  value: "Light",
+                  label: "Light",
+                },
+              ]}
+            />
+
+            <Text style={styles.sectionSubTitle} variant="titleMedium">
+              Navigation:
+            </Text>
+            <View style={styles.navButtonView}>
+              <Switch
+                value={headerMode}
+                onValueChange={() => setHeaderMode(!headerMode)}
+              />
+              <Text variant="titleMedium">Top Navigation Bar</Text>
+            </View>
+
+            <Text style={styles.sectionSubTitle} variant="titleMedium">
+              View Style:
+            </Text>
+            <SegmentedButtons
+              value={viewMode}
+              onValueChange={setViewMode}
+              buttons={[
+                {
+                  value: "App",
+                  label: "App",
+                },
+                {
+                  value: "List",
+                  label: "List",
+                },
+              ]}
+            />
+          </View>
+          <Text style={styles.sectionTitle} variant="displaySmall">
+            Custom Sorting
+          </Text>
+          <Divider />
+          <FlatList
+            numColumns={1}
+            data={sortedHomepageList}
+            renderItem={({ item }) => <ListItem homepage={item} />}
+            scrollEnabled={false}
+          />
+        </ScrollView>
+        <View style={styles.buttonView}>
+          <Button
+            mode="outlined"
+            style={styles.button}
+            onPress={() => router.back()}
+          >
+            Cancel
+          </Button>
+          <Button mode="contained" style={styles.button} onPress={saveSetting}>
+            Save
+          </Button>
+        </View>
+      </View>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  sectionTitle: { marginBottom: 8, marginLeft: 4 },
+  sectionSubTitle: {
+    marginBottom: 8,
+    marginTop: 8,
+    marginLeft: 4,
+  },
+  description: {},
+  cardView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
+    margin: 2,
+  },
+  cardIcon: {},
+  cardTitle: {
+    width: "50%",
+  },
+  navButtonView: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  buttonView: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: 75,
+    marginTop: 20,
+  },
+  button: {
+    width: "50%",
+    height: 50,
+    justifyContent: "center",
+    alignContent: "center",
+  },
+});
