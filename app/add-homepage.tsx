@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "react-native-paper";
 
-export default function Index() {
+export default function AddHomepageScreen() {
   const [name, setName] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [image, setImage] = useState<string>("");
