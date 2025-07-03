@@ -3,3 +3,5 @@ export interface Setting {
   navBar: boolean;
   viewStyle: string;
 }
+
+export type ThemePreference = "System" | "Dark" | "Light";
