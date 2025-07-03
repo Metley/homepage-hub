@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { Appbar } from "react-native-paper";
 import { WebView } from "react-native-webview";
 
-export default function Index() {
+export default function BrowserScreen() {
   const router = useRouter();
   return (
     <>
