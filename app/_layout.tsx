@@ -1,51 +1,55 @@
-import { SettingProvider } from "@/lib/setting.context";
+import { SettingProvider, useSettingContext } from "@/lib/setting.context";
 import { Stack, useRouter } from "expo-router";
-import { StyleSheet, useColorScheme, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import {
-  MD3DarkTheme,
-  MD3LightTheme,
-  PaperProvider,
-  useTheme,
-} from "react-native-paper";
-
+import { PaperProvider, useTheme } from "react-native-paper";
 const AppContent = () => {
   const router = useRouter();
-  const theme = useTheme();
+  const themeTest = useTheme();
+
+  const { theme } = useSettingContext();
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{ title: "Home", headerShown: false }}
-        />
-        <Stack.Screen name="browser" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="add-homepage"
-          options={{ title: "Add", headerShown: false }}
-        />
-        <Stack.Screen
-          name="setting"
-          options={{ title: "Setting", headerShown: false }}
-        />
-      </Stack>
-    </View>
+    <PaperProvider theme={theme}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: themeTest.colors.background },
+        ]}
+      >
+        <Stack>
+          <Stack.Screen
+            name="index"
+            options={{ title: "Home", headerShown: false }}
+          />
+          <Stack.Screen name="browser" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="add-homepage"
+            options={{ title: "Add", headerShown: false }}
+          />
+          <Stack.Screen
+            name="setting"
+            options={{ title: "Setting", headerShown: false }}
+          />
+        </Stack>
+      </View>
+    </PaperProvider>
   );
 };
 
+function RouteSetting({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
+
 export default function RootLayout() {
-  const theme = useColorScheme() === "dark" ? MD3DarkTheme : MD3LightTheme;
   return (
-    <PaperProvider theme={theme}>
+    <SettingProvider>
       <GestureHandlerRootView>
-        <SettingProvider>
+        <RouteSetting>
           <AppContent />
-        </SettingProvider>
+        </RouteSetting>
       </GestureHandlerRootView>
-    </PaperProvider>
+    </SettingProvider>
   );
 }
 
