@@ -2,13 +2,8 @@ import { HomePage } from "@/types/homepage.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import {
   Appbar,
   Avatar,
@@ -20,7 +15,7 @@ import {
 } from "react-native-paper";
 
 export default function Index() {
-  const [homepageList, setHomepageList] = useState<HomePage[]>();
+  const [homepageList, setHomepageList] = useState<HomePage[]>([]);
   const [sortType, setSortType] = useState<string>("ADDED - ASCENDING");
   const router = useRouter();
   const theme = useTheme();
@@ -46,6 +41,7 @@ export default function Index() {
       const currentList = JSON.parse(
         (await AsyncStorage.getItem("homepage-list")) || "[]"
       );
+
       setHomepageList(currentList);
     } catch (error) {
       console.error(error);
@@ -75,7 +71,7 @@ export default function Index() {
     await fetchHomepages();
   };
 
-  const Item = ({ homepage }) => (
+  const Item = ({ homepage }: { homepage: HomePage }) => (
     <Card
       style={styles.card}
       onPress={() => {
@@ -150,7 +146,7 @@ export default function Index() {
 
   const sortedHomepageList = homepageList?.sort(handleSortTypeChange(sortType));
 
-  const HomeCard = ({ homepage }) => (
+  const HomeCard = ({ homepage }: { homepage: HomePage }) => (
     <TouchableOpacity
       onPress={() => console.log(homepage.image)}
       style={styles.card}
@@ -185,7 +181,7 @@ export default function Index() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <Appbar.Header>
-        <Appbar.Action icon="cog" onPress={openMenu} />
+        <Appbar.Action icon="cog" onPress={() => router.navigate("/setting")} />
         <Appbar.Content title="Home" />
         <View
           style={{
@@ -251,7 +247,7 @@ export default function Index() {
 
       <View style={{}}>
         <FlatList
-          numColumns={3}
+          numColumns={4}
           data={sortedHomepageList}
           renderItem={({ item }) => <HomeCard homepage={item} />}
           contentContainerStyle={{}}
@@ -270,13 +266,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
     alignItems: "center",
-    width: "33.3%",
-    height: "auto",
+    width: "24%",
+    height: 75,
   },
   image: {
     backgroundColor: "#f5f5f5",
   },
   title: {
     marginTop: 1,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
 });
