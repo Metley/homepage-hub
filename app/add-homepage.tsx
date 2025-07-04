@@ -86,11 +86,11 @@ export default function AddHomepageScreen() {
       console.error(error);
     }
 
-    router.replace("/");
+    router.navigate("/");
   };
 
   const handleCancelHomepage = () => {
-    router.replace("/");
+    router.navigate("/");
   };
 
   return (
@@ -98,7 +98,7 @@ export default function AddHomepageScreen() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.BackAction onPress={() => router.navigate("/")} />
         <Appbar.Content title="Add Homepage" />
       </Appbar.Header>
       <View style={styles.imageContainer}>
