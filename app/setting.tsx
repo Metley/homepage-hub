@@ -1,6 +1,10 @@
 import { useSettingContext } from "@/lib/setting.context";
 import { HomePage } from "@/types/homepage.context";
-import { Setting, ThemePreference } from "@/types/setting.context";
+import {
+  Setting,
+  SortPrefrence,
+  ThemePreference,
+} from "@/types/setting.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -11,6 +15,7 @@ import {
   Button,
   Divider,
   IconButton,
+  RadioButton,
   SegmentedButtons,
   Switch,
   Text,
@@ -20,11 +25,12 @@ import {
 export default function SettingScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const { themePreference, setThemePreference } = useSettingContext();
+  const { setThemePreference } = useSettingContext();
 
   const [themeMode, setThemeMode] = useState<ThemePreference>("System");
   const [headerMode, setHeaderMode] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<string>("App");
+  const [sortPrefrence, setSortPrefrence] = useState<SortPrefrence>("CUSTOM");
 
   const [homepageList, setHomepageList] = useState<HomePage[]>([]);
   const [appSetting, setAppSetting] = useState<Setting>();
@@ -54,6 +60,7 @@ export default function SettingScreen() {
         setThemeMode(appSetting.theme);
         setHeaderMode(appSetting.navBar);
         setViewMode(appSetting.viewStyle);
+        setSortPrefrence(appSetting.sortPrefrence);
       } else {
         console.log("Failed to retrieve setting");
       }
@@ -125,6 +132,7 @@ export default function SettingScreen() {
         theme: themeMode,
         navBar: headerMode,
         viewStyle: viewMode,
+        sortPrefrence: sortPrefrence,
       };
       await AsyncStorage.setItem("setting", JSON.stringify(newAppSetting));
       await AsyncStorage.setItem("homepage-list", JSON.stringify(homepageList));
@@ -148,7 +156,7 @@ export default function SettingScreen() {
         style={[styles.container, { backgroundColor: theme.colors.background }]}
       >
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.BackAction onPress={() => router.navigate("/")} />
           <Appbar.Content title="Setting" />
         </Appbar.Header>
         <ScrollView style={{ marginBottom: 20 }}>
@@ -188,7 +196,9 @@ export default function SettingScreen() {
                 value={headerMode}
                 onValueChange={() => setHeaderMode(!headerMode)}
               />
-              <Text variant="titleMedium">Top Navigation Bar</Text>
+              <Text variant="titleMedium">
+                Top Navigation Bar in Browser Window
+              </Text>
             </View>
 
             <Text style={styles.sectionSubTitle} variant="titleMedium">
@@ -210,9 +220,48 @@ export default function SettingScreen() {
             />
           </View>
           <Text style={styles.sectionTitle} variant="displaySmall">
-            Custom Sorting
+            Sorting
           </Text>
           <Divider />
+          <Text style={styles.sectionSubTitle} variant="titleMedium">
+            Default Sorting Preference:
+          </Text>
+
+          <RadioButton.Group
+            onValueChange={(newValue: string) =>
+              setSortPrefrence(newValue as SortPrefrence)
+            }
+            value={sortPrefrence}
+          >
+            <View style={styles.radioRowView}>
+              <RadioButton value="CUSTOM" />
+              <Text>Custom</Text>
+            </View>
+            <View style={styles.radioRowView}>
+              <View style={styles.radioButtonView}>
+                <RadioButton value="ADDED - ASCENDING" />
+                <Text>Added - Ascending</Text>
+              </View>
+              <View style={styles.radioButtonView}>
+                <RadioButton value="ADDED - DESCENDING" />
+                <Text>Added - Descending</Text>
+              </View>
+            </View>
+            <View style={styles.radioRowView}>
+              <View style={styles.radioButtonView}>
+                <RadioButton value="NAME - ASCENDING" />
+                <Text>Name - Ascending</Text>
+              </View>
+              <View style={styles.radioButtonView}>
+                <RadioButton value="NAME - DESCENDING" />
+                <Text>Name - Descending</Text>
+              </View>
+            </View>
+          </RadioButton.Group>
+
+          <Text style={styles.sectionSubTitle} variant="titleMedium">
+            Custom:
+          </Text>
           <FlatList
             numColumns={1}
             data={sortedHomepageList}
@@ -224,7 +273,7 @@ export default function SettingScreen() {
           <Button
             mode="outlined"
             style={styles.button}
-            onPress={() => router.back()}
+            onPress={() => router.navigate("/")}
           >
             Cancel
           </Button>
@@ -241,7 +290,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  sectionTitle: { marginBottom: 8, marginLeft: 4 },
+  sectionTitle: {
+    marginBottom: 4,
+    marginLeft: 4,
+    marginTop: 16,
+  },
   sectionSubTitle: {
     marginBottom: 8,
     marginTop: 8,
@@ -272,7 +325,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 75,
+    marginBottom: 25,
     marginTop: 20,
   },
   button: {
@@ -280,5 +333,14 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     alignContent: "center",
+  },
+  radioRowView: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  radioButtonView: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "50%",
   },
 });
