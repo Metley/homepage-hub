@@ -6,6 +6,7 @@ import { MD3DarkTheme, MD3LightTheme, MD3Theme } from "react-native-paper";
 
 type SettingContextType = {
   setting: Setting | null;
+  setSetting: (pref: Setting) => void;
   theme: MD3Theme;
   setThemePreference: (pref: ThemePreference) => void;
   isDark: boolean;
@@ -34,6 +35,7 @@ export function SettingProvider({ children }: { children: React.ReactNode }) {
           theme: "System",
           navBar: false,
           viewStyle: "App",
+          sortPrefrence: "CUSTOM",
         };
         setSetting(defaultSetting);
         await AsyncStorage.setItem("setting", JSON.stringify(defaultSetting));
@@ -43,6 +45,7 @@ export function SettingProvider({ children }: { children: React.ReactNode }) {
         theme: "System",
         navBar: false,
         viewStyle: "App",
+        sortPrefrence: "CUSTOM",
       };
       setSetting(defaultSetting);
       await AsyncStorage.setItem("setting", JSON.stringify(defaultSetting));
@@ -63,7 +66,14 @@ export function SettingProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SettingContext.Provider
-      value={{ setting, getSetting, theme, isDark, setThemePreference }}
+      value={{
+        setting,
+        setSetting,
+        getSetting,
+        theme,
+        isDark,
+        setThemePreference,
+      }}
     >
       {children}
     </SettingContext.Provider>
