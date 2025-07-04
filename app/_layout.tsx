@@ -1,10 +1,10 @@
 import { SettingProvider, useSettingContext } from "@/lib/setting.context";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider, useTheme } from "react-native-paper";
+
 const AppContent = () => {
-  const router = useRouter();
   const themeTest = useTheme();
 
   const { theme } = useSettingContext();
