@@ -10,7 +10,6 @@ type SettingContextType = {
   theme: MD3Theme;
   setThemePreference: (pref: ThemePreference) => void;
   isDark: boolean;
-  getSetting: () => Promise<void | null>;
 };
 
 const SettingContext = createContext<SettingContextType | undefined>(undefined);
@@ -69,7 +68,6 @@ export function SettingProvider({ children }: { children: React.ReactNode }) {
       value={{
         setting,
         setSetting,
-        getSetting,
         theme,
         isDark,
         setThemePreference,
