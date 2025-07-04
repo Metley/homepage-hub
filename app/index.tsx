@@ -1,8 +1,15 @@
 import { HomePage } from "@/types/homepage.context";
+import { Setting, SortPrefrence } from "@/types/setting.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import {
   Appbar,
@@ -16,7 +23,11 @@ import {
 
 export default function Index() {
   const [homepageList, setHomepageList] = useState<HomePage[]>([]);
-  const [sortType, setSortType] = useState<string>("ADDED - ASCENDING");
+  const [appSetting, setAppSetting] = useState<Setting>();
+
+  const [sortType, setSortType] = useState<SortPrefrence>("CUSTOM");
+  const [viewStyle, setViewStyle] = useState<string>("App");
+
   const router = useRouter();
   const theme = useTheme();
 
@@ -24,7 +35,7 @@ export default function Index() {
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
-  const sortTypeList: string = [
+  const sortTypeList: string[] = [
     "ADDED - ASCENDING",
     "ADDED - DESCENDING",
     "NAME - ASCENDING",
@@ -34,6 +45,7 @@ export default function Index() {
 
   useEffect(() => {
     fetchHomepages();
+    fetchAppSetting();
   }, []);
 
   const fetchHomepages = async () => {
@@ -43,6 +55,22 @@ export default function Index() {
       );
 
       setHomepageList(currentList);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchAppSetting = async () => {
+    try {
+      const appSettingStorage = await AsyncStorage.getItem("setting");
+      if (appSettingStorage !== null) {
+        const appSetting = JSON.parse(appSettingStorage);
+        setSortType(appSetting.sortPrefrence);
+        setViewStyle(appSetting.viewStyle);
+        setAppSetting(appSetting);
+      } else {
+        console.log("Failed to retrieve setting");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -148,7 +176,12 @@ export default function Index() {
 
   const HomeCard = ({ homepage }: { homepage: HomePage }) => (
     <TouchableOpacity
-      onPress={() => console.log(homepage.image)}
+      onPress={() =>
+        router.navigate({
+          pathname: "/browser",
+          params: { url: homepage.url, name: homepage.name },
+        })
+      }
       style={styles.card}
     >
       {homepage.image !==
@@ -176,6 +209,41 @@ export default function Index() {
     </TouchableOpacity>
   );
 
+  const HomeCardListItem = ({ homepage }: { homepage: HomePage }) => (
+    <TouchableOpacity
+      onPress={() =>
+        router.navigate({
+          pathname: "/browser",
+          params: { url: homepage.url, name: homepage.name },
+        })
+      }
+      style={styles.cardListItem}
+    >
+      {homepage.image !==
+      "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000" ? (
+        <Avatar.Image
+          style={{ backgroundColor: theme.colors.background }}
+          size={48}
+          source={{ uri: homepage.image }}
+        />
+      ) : (
+        <Avatar.Text
+          style={{
+            backgroundColor: theme.colors.background,
+            borderColor: theme.colors.outline,
+            borderWidth: 1,
+          }}
+          size={48}
+          label={homepage.name[0]}
+        />
+      )}
+
+      <Text numberOfLines={1} style={styles.titleListItem}>
+        {homepage.name}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -194,6 +262,16 @@ export default function Index() {
             onDismiss={closeMenu}
             anchor={<Appbar.Action icon="sort-variant" onPress={openMenu} />}
           >
+            <Menu.Item
+              leadingIcon="sort"
+              onPress={() => {
+                setSortType("CUSTOM");
+                closeMenu();
+              }}
+              title="Custom"
+            />
+            <Divider />
+
             <Menu.Item
               leadingIcon="sort-ascending"
               onPress={() => {
@@ -227,15 +305,6 @@ export default function Index() {
               }}
               title="Name"
             />
-            <Divider />
-            <Menu.Item
-              leadingIcon="sort"
-              onPress={() => {
-                setSortType("CUSTOM");
-                closeMenu();
-              }}
-              title="Custom"
-            />
           </Menu>
         </View>
 
@@ -246,13 +315,22 @@ export default function Index() {
       </Appbar.Header>
 
       <View style={{}}>
-        <FlatList
-          numColumns={4}
-          data={sortedHomepageList}
-          renderItem={({ item }) => <HomeCard homepage={item} />}
-          contentContainerStyle={{}}
-          columnWrapperStyle={{ justifyContent: "flex-start" }}
-        />
+        {viewStyle === "App" ? (
+          <FlatList
+            numColumns={4}
+            data={sortedHomepageList}
+            renderItem={({ item }) => <HomeCard homepage={item} />}
+            contentContainerStyle={{}}
+            columnWrapperStyle={{ justifyContent: "flex-start" }}
+            scrollEnabled={true}
+          />
+        ) : (
+          <ScrollView>
+            {sortedHomepageList.map((item, index) => (
+              <HomeCardListItem key={index} homepage={item} />
+            ))}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
@@ -269,6 +347,14 @@ const styles = StyleSheet.create({
     width: "24%",
     height: 75,
   },
+  cardListItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginLeft: 16,
+    marginTop: 4,
+    marginBottom: 4,
+  },
   image: {
     backgroundColor: "#f5f5f5",
   },
@@ -276,5 +362,8 @@ const styles = StyleSheet.create({
     marginTop: 1,
     paddingLeft: 5,
     paddingRight: 5,
+  },
+  titleListItem: {
+    marginLeft: 8,
   },
 });
