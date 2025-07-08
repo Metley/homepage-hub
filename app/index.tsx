@@ -182,6 +182,16 @@ export default function Index() {
           params: { url: homepage.url, name: homepage.name },
         })
       }
+      onLongPress={() =>
+        router.navigate({
+          pathname: "/edit-homepage",
+          params: {
+            url: homepage.url,
+            name: homepage.name,
+            custom_position: homepage.custom_position,
+          },
+        })
+      }
       style={styles.card}
     >
       {homepage.image !==
@@ -215,6 +225,16 @@ export default function Index() {
         router.navigate({
           pathname: "/browser",
           params: { url: homepage.url, name: homepage.name },
+        })
+      }
+      onLongPress={() =>
+        router.navigate({
+          pathname: "/edit-homepage",
+          params: {
+            url: homepage.url,
+            name: homepage.name,
+            custom_position: homepage.custom_position,
+          },
         })
       }
       style={styles.cardListItem}

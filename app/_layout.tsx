@@ -28,6 +28,10 @@ const AppContent = () => {
             options={{ title: "Add", headerShown: false }}
           />
           <Stack.Screen
+            name="edit-homepage"
+            options={{ title: "Edit", headerShown: false }}
+          />
+          <Stack.Screen
             name="setting"
             options={{ title: "Setting", headerShown: false }}
           />
