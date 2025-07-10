@@ -5,4 +5,8 @@
 
 Save all your homepages in one app and access with a single tap
 
+## Download
+
+[![Github Action Build]](https://github.com/Metley/homepage-hub/actions/runs/16188460972/artifacts/3501976996)
+
 </div>
