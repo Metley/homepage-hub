@@ -13,6 +13,9 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
+      "android": {
+        "versionCode": 1
+      },
       "package": "com.metley.homepagehub"
     },
     "web": {
