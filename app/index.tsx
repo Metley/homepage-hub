@@ -3,18 +3,11 @@ import { Setting, SortPrefrence } from "@/types/setting.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import {
   Appbar,
   Avatar,
-  Card,
   Divider,
   Menu,
   Text,
@@ -34,14 +27,6 @@ export default function Index() {
   const [visible, setVisible] = useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
-
-  const sortTypeList: string[] = [
-    "ADDED - ASCENDING",
-    "ADDED - DESCENDING",
-    "NAME - ASCENDING",
-    "NAME - DESCENDING",
-    "CUSTOM",
-  ];
 
   useEffect(() => {
     fetchHomepages();
@@ -75,53 +60,6 @@ export default function Index() {
       console.error(error);
     }
   };
-
-  const getImage = (url: string) => {
-    if (url.length > 0) {
-      return "http://" + url.toLowerCase() + "/favicon.ico";
-    } else {
-      return "https://img.icons8.com/?size=100&id=73&format=png&color=000000";
-    }
-  };
-
-  const handleFetchImage = async (url: string) => {
-    const response = await fetch(url.toLowerCase() + "/favicon.ico");
-
-    if (response.headers.get("content-type") === "image/x-icon") {
-      return url.toLowerCase() + "/favicon.ico";
-    } else {
-      return "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000";
-    }
-  };
-
-  const resetDatabase = async () => {
-    await AsyncStorage.clear();
-    await fetchHomepages();
-  };
-
-  const Item = ({ homepage }: { homepage: HomePage }) => (
-    <Card
-      style={styles.card}
-      onPress={() => {
-        console.log(homepage.image);
-      }}
-    >
-      <Image src={homepage.image} height={48} width={48} style={styles.image} />
-      <Card.Title
-        style={styles.title}
-        title={homepage.name}
-        left={(props) => (
-          <Image
-            {...props}
-            src={getImage(homepage.url)}
-            height={48}
-            width={48}
-            style={styles.image}
-          />
-        )}
-      />
-    </Card>
-  );
 
   const handleSortTypeChange = (type: string) => {
     switch (type) {
