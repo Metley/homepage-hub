@@ -7,7 +7,6 @@ import {
   Appbar,
   Button,
   HelperText,
-  Text,
   TextInput,
   useTheme,
 } from "react-native-paper";
@@ -20,7 +19,6 @@ export default function AddHomepageScreen() {
   const [errorNameMessage, setErrorNameMessage] = useState<string>("");
   const [errorUrlMessage, setErrorUrlMessage] = useState<string>("");
   const [debugMessage, setDebugMessage] = useState("");
-  const [fetchErrorMessage, setFetchErrorMessage] = useState<string>("");
 
   const router = useRouter();
   const theme = useTheme();
@@ -58,7 +56,6 @@ export default function AddHomepageScreen() {
           "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
         );
         setErrorImageMessage("Favicon not found");
-        setFetchErrorMessage(response.statusText);
       }
     } catch (error) {
       setImage(
@@ -110,8 +107,7 @@ export default function AddHomepageScreen() {
       <View style={styles.imageContainer}>
         <Image src={image} width={100} height={100} style={styles.image} />
         <HelperText type="error">{errorImageMessage}</HelperText>
-        <Text>{debugMessage}</Text>
-        <Text>{fetchErrorMessage}</Text>
+        {/* <Text>{debugMessage}</Text> */}
       </View>
       <View style={styles.inputContainer}>
         <TextInput
