@@ -16,7 +16,8 @@
       "android": {
         "versionCode": 1
       },
-      "package": "com.metley.homepagehub"
+      "package": "com.metley.homepagehub",
+      "useCleartext": true
     },
     "web": {
       "bundler": "metro",

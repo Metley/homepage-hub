@@ -47,10 +47,9 @@ export default function AddHomepageScreen() {
   const handleFetchImage = async (input: string) => {
     if (!input) return;
     setDebugMessage("");
-    setFetchErrorMessage("");
     try {
       const response = await fetch(input.toLowerCase() + "/favicon.ico");
-      setFetchErrorMessage(response.statusText);
+
       if (response.headers.get("content-type") === "image/x-icon") {
         setImage(input.toLowerCase() + "/favicon.ico");
         setErrorImageMessage("");
@@ -59,6 +58,7 @@ export default function AddHomepageScreen() {
           "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
         );
         setErrorImageMessage("Favicon not found");
+        setFetchErrorMessage(response.statusText);
       }
     } catch (error) {
       setImage(
