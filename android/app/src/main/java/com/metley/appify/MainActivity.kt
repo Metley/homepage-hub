@@ -1,4 +1,4 @@
-package com.metley.homepagehub
+package com.metley.appify
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
