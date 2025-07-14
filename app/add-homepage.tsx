@@ -18,6 +18,7 @@ export default function AddHomepageScreen() {
   const [errorImageMessage, setErrorImageMessage] = useState<string>("");
   const [errorNameMessage, setErrorNameMessage] = useState<string>("");
   const [errorUrlMessage, setErrorUrlMessage] = useState<string>("");
+  const [debugMessage, setDebugMessage] = useState("");
 
   const router = useRouter();
   const theme = useTheme();
@@ -43,6 +44,7 @@ export default function AddHomepageScreen() {
 
   const handleFetchImage = async (input: string) => {
     if (!input) return;
+    setDebugMessage("");
     try {
       const response = await fetch(input.toLowerCase() + "/favicon.ico");
 
@@ -60,6 +62,7 @@ export default function AddHomepageScreen() {
         "https://img.icons8.com/?size=100&id=j1UxMbqzPi7n&format=png&color=000000"
       );
       setErrorImageMessage("Favicon not found");
+      setDebugMessage(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -104,6 +107,7 @@ export default function AddHomepageScreen() {
       <View style={styles.imageContainer}>
         <Image src={image} width={100} height={100} style={styles.image} />
         <HelperText type="error">{errorImageMessage}</HelperText>
+        {/* <Text>{debugMessage}</Text> */}
       </View>
       <View style={styles.inputContainer}>
         <TextInput

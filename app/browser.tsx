@@ -52,7 +52,7 @@ export default function BrowserScreen() {
           </Appbar.Header>
         )}
 
-        <WebView source={{ uri: url }} />
+        <WebView source={{ uri: url }} mixedContentMode="always" />
       </View>
     </>
   );
