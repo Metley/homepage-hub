@@ -7,7 +7,7 @@ Save all your homepages in one app and access with a single tap
 
 ## Download
 
-[!Github Action Build](https://github.com/Metley/Appify/tree/master/release/Appify.apk)
+[Github APK Link](https://github.com/Metley/Appify/tree/master/release/Appify.apk)
 
 Or build the app yourself using: eas build --platform android --local
 
