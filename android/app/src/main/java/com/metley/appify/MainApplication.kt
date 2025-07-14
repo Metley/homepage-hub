@@ -1,4 +1,4 @@
-package com.metley.homepagehub
+package com.metley.appify
 
 import android.app.Application
 import android.content.res.Configuration

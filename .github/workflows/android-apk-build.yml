@@ -35,10 +35,10 @@ jobs:
         run: npm ci
 
       - name: Build Android app
-        run: eas build --platform android --profile preview --local --output ${{ github.workspace }}/releases/download/homepage-hub.apk
+        run: eas build --platform android --profile preview --local --output ${{ github.workspace }}/releases/download/Appify.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ github.workspace }}/releases/download/homepage-hub.apk
+          path: ${{ github.workspace }}/releases/download/Appify.apk
