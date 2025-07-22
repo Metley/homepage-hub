@@ -2,10 +2,14 @@ import { SettingProvider, useSettingContext } from "@/lib/setting.context";
 import { Stack } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { PaperProvider, useTheme } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const AppContent = () => {
-  const themeTest = useTheme();
+  const insets = useSafeAreaInsets();
 
   const { theme } = useSettingContext();
 
@@ -14,7 +18,10 @@ const AppContent = () => {
       <View
         style={[
           styles.container,
-          { backgroundColor: themeTest.colors.background },
+          {
+            paddingBottom: insets.bottom,
+            backgroundColor: theme.colors.background,
+          },
         ]}
       >
         <Stack>
@@ -22,10 +29,17 @@ const AppContent = () => {
             name="index"
             options={{ title: "Home", headerShown: false }}
           />
-          <Stack.Screen name="browser" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="browser"
+            options={{ headerShown: false, statusBarHidden: true }}
+          />
           <Stack.Screen
             name="add-homepage"
-            options={{ title: "Add", headerShown: false }}
+            options={{
+              title: "Add",
+              headerShown: false,
+              navigationBarHidden: true,
+            }}
           />
           <Stack.Screen
             name="edit-homepage"
@@ -47,13 +61,15 @@ function RouteSetting({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <SettingProvider>
-      <GestureHandlerRootView>
-        <RouteSetting>
-          <AppContent />
-        </RouteSetting>
-      </GestureHandlerRootView>
-    </SettingProvider>
+    <SafeAreaProvider>
+      <SettingProvider>
+        <GestureHandlerRootView>
+          <RouteSetting>
+            <AppContent />
+          </RouteSetting>
+        </GestureHandlerRootView>
+      </SettingProvider>
+    </SafeAreaProvider>
   );
 }
 
