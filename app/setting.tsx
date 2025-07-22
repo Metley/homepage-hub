@@ -6,7 +6,6 @@ import {
   ThemePreference,
 } from "@/types/setting.context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as NavigationBar from "expo-navigation-bar";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -39,8 +38,6 @@ export default function SettingScreen() {
   useEffect(() => {
     fetchHomepages();
     fetchAppSetting();
-    NavigationBar.setVisibilityAsync("hidden");
-    NavigationBar.setBehaviorAsync("inset-swipe");
   }, []);
 
   const fetchHomepages = async () => {

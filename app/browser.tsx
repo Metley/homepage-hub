@@ -1,15 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as NavigationBar from "expo-navigation-bar";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { StatusBar, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Appbar, useTheme } from "react-native-paper";
 
 import { WebView } from "react-native-webview";
 
 export default function BrowserScreen() {
-  // const [name, setName] = useState<string>();
-  // const [url, setUrl] = useState<string>();
   const { url, name } = useLocalSearchParams<{
     url: string;
     name: string;
@@ -21,9 +18,6 @@ export default function BrowserScreen() {
 
   useEffect(() => {
     fetchAppSetting();
-    NavigationBar.setVisibilityAsync("hidden");
-    NavigationBar.setBehaviorAsync("inset-swipe");
-    StatusBar.setHidden(true, "fade");
   }, []);
 
   const fetchAppSetting = async () => {
